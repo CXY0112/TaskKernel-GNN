@@ -1,0 +1,156 @@
+# TaskKernel-GNN 常用超参数配置
+# 修改本文件后，可通过 TaskKernelConfig.from_yaml(...) 读取。
+# 当前默认值对应已经完成实验所采用的通用起点；D4 门控实验主要修改
+# message_gate.end_temperature 和 message_gate.entropy_weight。
+
+# 邻居消息聚合方式。
+# 可选值：add、mean。物理矢量叠加默认使用 add。
+aggregation: add
+
+message_gate:
+  # 消息核 softmax 的初始温度 tau_a,start。
+  # 取值范围：(0, +inf)；通常设为 1.0。
+  start_temperature: 1.0
+
+  # 消息核 softmax 的最终温度 tau_a,final。
+  # 取值范围：(0, +inf)；越小权重越集中，建议比较 0.3、0.5、0.7。
+  end_temperature: 0.5
+
+  # 训练前期保持初始温度的比例。
+  # 取值范围：[0, 1]；0.30 表示前 30% 训练不降低温度。
+  hold_fraction: 0.30
+
+  # 消息核熵惩罚最大系数 lambda_a,max。
+  # 取值范围：[0, +inf)；0 表示关闭，首轮建议比较 0、0.001、0.003、0.01。
+  entropy_weight: 0.0
+
+  # 熵惩罚开始增长的训练进度。
+  # 取值范围：[0, 1]；建议不早于温度预热结束位置。
+  entropy_start_fraction: 0.30
+
+  # 熵惩罚增长到最大值的训练进度。
+  # 取值范围：[0, 1]，且不小于 entropy_start_fraction。
+  entropy_end_fraction: 0.80
+
+  # 是否用 log(K) 归一化熵，使不同候选核数量下的熵约在 [0, 1]。
+  normalize_entropy: true
+
+  # 计算 log(a_k) 时防止数值下溢的小常数，不建议调节。
+  # 取值范围：(0, +inf)。
+  entropy_epsilon: 1.0e-8
+
+  # 消息核门控 logits 初值。空列表表示所有核从相同权重开始。
+  # 非空时长度必须等于 kernels.message_names 的长度。
+  initial_logits: []
+
+update_gate:
+  # 节点更新核 softmax 的初始温度 tau_b,start，范围为 (0, +inf)。
+  start_temperature: 1.0
+
+  # 节点更新核最终温度 tau_b,final，范围为 (0, +inf)。
+  # 当前冻结方案使用 0.3；D4 第一轮不调节该参数。
+  end_temperature: 0.3
+
+  # 前期保持节点门控初始温度的训练比例，范围为 [0, 1]。
+  hold_fraction: 0.30
+
+  # 节点门控熵惩罚 lambda_b,max，范围为 [0, +inf)。
+  # D4 第一轮固定为 0，只研究消息核选择。
+  entropy_weight: 0.0
+
+  # 节点门控熵惩罚的起止进度，范围均为 [0, 1]。
+  entropy_start_fraction: 0.30
+  entropy_end_fraction: 0.80
+  normalize_entropy: true
+  entropy_epsilon: 1.0e-8
+
+  # 空列表表示节点核从相同 logit 开始；非空时长度必须匹配节点核数量。
+  initial_logits: []
+
+mlp:
+  # MLP 消息核最大相对强度 eta。
+  # 取值范围：[0, +inf)；当前通用默认值为 0.1，Cardiac 常用 0.05～0.1。
+  eta: 0.1
+
+  # 是否强制 MLP 消息满足对称/作用反作用结构。
+  # 可选值：true、false；当前默认关闭，由具体物理任务决定是否启用。
+  symmetric: false
+
+calibration:
+  # 是否在门控前对不同候选核做固定响应尺度校准。
+  enabled: true
+
+  # 校准方法。目前只支持 rms。
+  method: rms
+
+  # RMS 的数值下限，防止除零，范围为 (0, +inf)。
+  minimum_rms: 1.0e-8
+
+  # 校准倍率裁剪范围，要求 0 < minimum_scale <= maximum_scale。
+  minimum_scale: 0.1
+  maximum_scale: 10.0
+
+  # 拟合一次后是否固定校准系数。建议保持 true，避免与门控权重相互补偿。
+  fixed_after_fit: true
+
+  # 从训练轨迹哪些相对时间位置采样核响应，元素范围为 [0, 1]。
+  sample_fractions: [0.20, 0.40, 0.60, 0.80]
+
+kernels:
+  # 消息核名称，顺序必须与传入模型的消息核顺序一致。
+  # 示例：[diffusion, fiber, graph, mlp]。空列表表示由实验代码提供名称。
+  message_names: []
+
+  # 节点更新核名称，顺序必须与传入模型的节点核顺序一致。
+  # 示例：[ap, fhn, decay, mlp]。空列表表示由实验代码提供名称。
+  update_names: []
+
+  # 可直接由注册表构造的消息核规格。每项包含 type、可选 name 和 parameters。
+  # 具体实验可复制 config.yaml 后填入；全局模板保持为空。
+  # 示例：
+  # - type: graph_diffusion
+  #   name: diffusion
+  #   parameters: {diffusion: 0.1}
+  message_specs: []
+
+  # 节点核规格，格式与 message_specs 相同。
+  # 示例：
+  # - type: polynomial_reaction
+  #   name: cubic
+  #   parameters: {coefficients: [0.5, 0.0, -0.7], dt: 0.02}
+  update_specs: []
+
+  # 哪些核的配置参数 c 必须为正；名称必须出现在上述两个核列表中。
+  # 示例：[diffusion, fiber]。
+  positive_configurations: []
+
+  # 核配置参数 c 的上下界，格式为 kernel_name: [下界, 上界]。
+  # null 表示该方向不设边界。默认由具体实验设置。
+  # 示例：diffusion: [0.0, null]
+  configuration_bounds: {}
+
+optimizer:
+  # 模型基础学习率，范围为 (0, +inf)。常用范围 1e-4～3e-3。
+  learning_rate: 0.003
+
+  # 门控 logits 学习率相对于基础学习率的倍率。
+  # 范围为 (0, +inf)；若门控过早塌缩，可尝试 0.5。
+  gate_learning_rate_scale: 1.0
+
+  # L2 权重衰减，范围为 [0, +inf)。
+  weight_decay: 1.0e-6
+
+  # 梯度裁剪阈值，范围为 (0, +inf)。
+  max_gradient_norm: 2.0
+
+  # 优化步数，正整数。正式实验应与对应基线使用相同预算。
+  training_steps: 400
+
+  # 多步 rollout 训练窗口长度，正整数；越大越关注长期稳定性但计算更贵。
+  rollout_window: 6
+
+  # 单次训练批量大小，正整数；实际可用值受图规模和显存限制。
+  batch_size: 96
+
+  # 随机种子，非负整数；正式比较应使用多个种子。
+  seed: 0

@@ -1,0 +1,17 @@
+{
+  "wsl": {
+    "version": "3.0.1",
+    "source": "https://github.com/microsoft/WSL/releases/download/3.0.1/wsl.3.0.1.0.x64.msi",
+    "expected_bytes": 367669248,
+    "expected_sha256": "28b1a0d013640a2ac95898ea705fa186e5b4ff767a1c1b49257161bc106599c6",
+    "verification_source": "https://api.github.com/repos/microsoft/WSL/releases/assets/591350787"
+  },
+  "opencarp": {
+    "version": "20.0",
+    "source": "https://git.opencarp.org/api/v4/projects/16/packages/generic/opencarp-linux/v20.0/opencarp-v20.0.deb",
+    "expected_bytes": 356859462,
+    "expected_sha256": "1d3572ce8b7c5c2f7e61505247118a507c50a45cece18195b40018eecd14834a",
+    "verification_source": "https://git.opencarp.org/api/v4/projects/16/packages/261/package_files"
+  },
+  "note": "Expected values from official release APIs; package download and verification status must be checked separately."
+}
