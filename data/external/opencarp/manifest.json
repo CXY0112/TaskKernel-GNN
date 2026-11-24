@@ -1,0 +1,32 @@
+{
+  "dataset": "openCARP Niederer N-version benchmark inputs",
+  "repository": "https://git.opencarp.org/openCARP/experiments.git",
+  "commit": "c554f4bf4fde2da965c85c78e3c003b171218e7f",
+  "sparse_path": "examples/02_EP_tissue/03G_study_resolution",
+  "files": [
+    {
+      "name": "__init__.py",
+      "bytes": 350,
+      "sha256": "9debe0708320272673797d379c0bb3ef5fd0cac9a5c463d31098625f6e646faa"
+    },
+    {
+      "name": "nversion.par",
+      "bytes": 1638,
+      "sha256": "2fa2a2256539bf22aef71708df36c841c550fa0ca0771bea84c45500d91ffb47"
+    },
+    {
+      "name": "run.py",
+      "bytes": 13100,
+      "sha256": "dc6cc1be58b88b35ecbd72344a54cb50efd6bee79e75a8ff8d63e5074bf6396b"
+    },
+    {
+      "name": "singlecell.sv",
+      "bytes": 898,
+      "sha256": "bd26eb9da8ed7356f4fb1fd997f5e5d03cdabcfa746757bcfcb777217261a7fe"
+    }
+  ],
+  "trajectories_downloaded": 0,
+  "trajectory_status": "generated later with openCARP; no pre-generated official trajectory archive exists",
+  "maximum_training_trajectories": 128,
+  "budget_document": "DATA_BUDGET.zh-CN.md"
+}

@@ -1,0 +1,59 @@
+{
+  "dataset": "PDEBench 2D Diffusion-Reaction",
+  "official_file": "2D_diff-react_NA_NA.h5",
+  "official_url": "https://darus.uni-stuttgart.de/api/access/datafile/133017",
+  "doi": "10.18419/DARUS-2986",
+  "license": "CC BY 4.0",
+  "prepared_on": "2026-09-17",
+  "bytes": 13243560688,
+  "md5": "b8d0b86064193195ddc30c33be5dc949",
+  "sample_count": 1000,
+  "first_sample_key": "0000",
+  "last_sample_key": "0999",
+  "sample_schema": {
+    "data": {
+      "shape": [
+        101,
+        128,
+        128,
+        2
+      ],
+      "dtype": "float32"
+    },
+    "grid/t": {
+      "shape": [
+        101
+      ],
+      "dtype": "float32"
+    },
+    "grid/x": {
+      "shape": [
+        128
+      ],
+      "dtype": "float32"
+    },
+    "grid/y": {
+      "shape": [
+        128
+      ],
+      "dtype": "float32"
+    }
+  },
+  "data_shapes": [
+    [
+      101,
+      128,
+      128,
+      2
+    ]
+  ],
+  "data_dtypes": [
+    "float32"
+  ],
+  "first_sample_probe": {
+    "finite": true,
+    "minimum": -4.24711799621582,
+    "maximum": 4.241771697998047
+  },
+  "split_file": "splits.json"
+}

@@ -1,0 +1,38 @@
+# E2 论文主实验配置
+dataset:
+  root: data/external/opencarp/generated/protocol_v1
+  protocol: data/external/opencarp/generated/run_plan_v1.json
+  history_frames: 8 # 过去 8 个电位帧；起始帧重复填充，不读取未来。
+  voltage_offset_mv: 85.0 # 固定物理归一化：(Vm+85)/100。
+  voltage_scale_mv: 100.0
+  output_interval_ms: 1.0
+training:
+  primary_budget: 16
+  seeds: [0, 42, 37]
+  steps: 20000
+  learning_rate: 0.001
+  weight_decay: 0.000001
+  rollout_window: 10
+  validation_interval: 250
+  early_stopping_patience: 8
+  max_gradient_norm: 2.0
+models: [taskkernel]
+taskkernel:
+  temperature: 0.1 # a、b 两组温度相同。
+  entropy_weight: 0.0
+  hidden: 64
+  eta: 0.1 # 连续系数 MLP 消息修正和节点 MLP 修正的初始强度。
+  symmetric: false
+  aggregation: add
+  calibration: true # 仅训练轨迹拟合解析核 RMS，冻结；MLP 不放大。
+  calibration_scope: messages_only # 节点核含公共聚合项，其整体倍率保持 1。
+  internal_step_safety: 0.4 # 根据 FEM 行绝对权重界选择内部显式子步。
+  max_internal_steps: 512 # 超过则报错；不静默裁剪。
+  checkpoint_substeps: true # 反向传播重算子步，减少细网格显存/内存。
+evaluation:
+  suites: [id_test, mesh_ood, stimulus_ood]
+  rollout_steps: [1, 10, 50]
+  metrics: [mse, rmse, relative_l2, activation_time_mae, activation_coverage]
+  activation_threshold_mv: 0.0
+  activation_reference: sampled_voltage # 同输出间隔阈值插值，避免 native LAT 采样不公平。
+  native_lat: diagnostic_only

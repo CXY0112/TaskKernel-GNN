@@ -1,0 +1,51 @@
+dataset:
+  name: pdebench
+  root: data/external/pdebench/2d_diffusion_reaction
+  data_file: 2D_diff-react_NA_NA.h5
+  split_file: splits.json
+  train_spatial_stride: 2
+  id_spatial_stride: 2
+  mesh_ood_spatial_stride: 1
+  train_time: [0, 51]
+  temporal_ood_time: [50, 101]
+training:
+  budgets: [4, 8, 16, 32, 64, 128]
+  primary_budget: 16
+  seeds: [0, 1, 2]
+  steps: 20000
+  rollout_window: 10
+  batch_size: 1
+  learning_rate: 0.001
+  validation_interval: 250
+  validation_batches: 3
+  early_stopping_patience: 8
+  evaluation_samples: 10
+evaluation:
+  suites:
+    id: {split: test, spatial_stride: 2, time: [0, 51]}
+    temporal_ood: {split: test, spatial_stride: 2, time: [50, 101]}
+    mesh_ood: {split: test, spatial_stride: 1, time: [0, 51], taskkernel_substeps: 4}
+  rollout_steps: [1, 10, 50]
+  metrics: [mse, rmse, relative_l2]
+models:
+  taskkernel: {track: frozen}
+taskkernel:
+  aggregation: add
+  message_gate: {start_temperature: 0.1, end_temperature: 0.1, hold_fraction: 0.3, entropy_weight: 0.0, entropy_start_fraction: 0.3, entropy_end_fraction: 0.8, normalize_entropy: true, entropy_epsilon: 1.0e-8, initial_logits: [0.0, 0.0, 0.0]}
+  update_gate: {start_temperature: 0.1, end_temperature: 0.1, hold_fraction: 0.3, entropy_weight: 0.0, entropy_start_fraction: 0.3, entropy_end_fraction: 0.8, normalize_entropy: true, entropy_epsilon: 1.0e-8, initial_logits: [0.0, 0.0, 0.0]}
+  mlp: {eta: 0.1, symmetric: false}
+  calibration: {enabled: true, method: rms, minimum_rms: 1.0e-8, minimum_scale: 0.1, maximum_scale: 10.0, fixed_after_fit: true, sample_fractions: [0.2, 0.4, 0.6, 0.8]}
+  kernels:
+    message_names: [diffusion, gaussian, mlp]
+    update_names: [fhn, polynomial, mlp]
+    message_specs:
+      - {type: graph_diffusion, name: diffusion, parameters: {diffusion: 0.001, learnable: true}}
+      - {type: gaussian_diffusion, name: gaussian, parameters: {diffusion: 0.001, beta: 1.0}}
+      - {type: mlp, name: mlp, parameters: {node_features: 2, edge_features: 4, output_features: 2, hidden: 64, eta: 0.1}}
+    update_specs:
+      - {type: fitzhugh_nagumo, name: fhn, parameters: {dt: 0.05, epsilon: 0.02}}
+      - {type: polynomial_reaction, name: polynomial, parameters: {coefficients: [0.0, 0.1, -0.1], dt: 0.05}}
+      - {type: mlp, name: mlp, parameters: {state_features: 2, message_features: 2, output_features: 2, hidden: 64, eta: 0.1}}
+    positive_configurations: [diffusion, gaussian]
+    configuration_bounds: {diffusion: [0.0, null], gaussian: [0.0, null]}
+  optimizer: {learning_rate: 0.001, gate_learning_rate_scale: 1.0, weight_decay: 1.0e-6, max_gradient_norm: 2.0, training_steps: 20000, rollout_window: 10, batch_size: 1, seed: 0}

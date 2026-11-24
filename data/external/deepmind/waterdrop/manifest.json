@@ -1,0 +1,37 @@
+{
+  "dataset": "DeepMind Learning to Simulate / WaterDrop",
+  "local_selection": "first 128 complete records from official training TFRecord",
+  "official_full_train": {
+    "url": "https://storage.googleapis.com/learning-to-simulate-complex-physics/Datasets/WaterDrop/train.tfrecord",
+    "bytes": 4541246980,
+    "etag_md5": "80ce396abd6628336246b525577ec8b2",
+    "records": 1000
+  },
+  "local_files": [
+    {
+      "file": "train_128.tfrecord",
+      "records": 128,
+      "bytes": 582365383,
+      "md5": "5eb60f3d1727c81551570d77ab26b847"
+    },
+    {
+      "file": "valid.tfrecord",
+      "records": 30,
+      "bytes": 137190408,
+      "md5": "b387c27a4848ba7bddc4d0e31c5431eb"
+    },
+    {
+      "file": "test.tfrecord",
+      "records": 30,
+      "bytes": 136885800,
+      "md5": "f3adcb63381dfa08e4b61f1eafdab43e"
+    }
+  ],
+  "metadata": {
+    "url": "https://storage.googleapis.com/learning-to-simulate-complex-physics/Datasets/WaterDrop/metadata.json",
+    "bytes": 361,
+    "md5": "f23537048cb1540e97086bf23c431c3f"
+  },
+  "total_local_bytes": 856441952,
+  "split_file": "splits.json"
+}
