@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "taskkernel-gnn"
+version = "0.1.0"
+description = "Task-prior multi-kernel graph neural networks"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+dependencies = ["h5py>=3.11", "numpy", "torch", "PyYAML>=6"]
+
+[project.optional-dependencies]
+experiments = ["matplotlib", "pandas", "scipy", "Pillow"]
+anatomical = ["gmsh==4.15.2"]
+iso17 = ["ase"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+taskkernel_gnn = ["config.yaml"]
